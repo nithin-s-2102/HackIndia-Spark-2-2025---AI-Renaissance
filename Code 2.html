@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emergency Medical Info</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #ff758c, #ff7eb3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: white;
+        }
+        .container {
+            max-width: 500px;
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 0.8s ease-in-out;
+            color: black;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        h2, h3 {
+            text-align: center;
+            color: #ff758c;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #218838;
+        }
+        .qr-container {
+            text-align: center;
+            margin-top: 15px;
+        }
+        .details p {
+            background: #f4f4f4;
+            padding: 8px;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container" id="form-container">
+    <h2>Emergency Medical Form</h2>
+    
+    <label>Full Name</label>
+    <input type="text" id="name">
+    
+    <label>Date of Birth</label>
+    <input type="date" id="dob">
+    
+    <label>Gender</label>
+    <select id="gender">
+        <option>Male</option>
+        <option>Female</option>
+        <option>Other</option>
+    </select>
+    
+    <label>Blood Type</label>
+    <select id="blood">
+        <option>A+</option>
+        <option>A-</option>
+        <option>B+</option>
+        <option>B-</option>
+        <option>O+</option>
+        <option>O-</option>
+        <option>AB+</option>
+        <option>AB-</option>
+    </select>
+    
+    <label>Phone</label>
+    <input type="tel" id="phone">
+    
+    <label>Address</label>
+    <textarea id="address"></textarea>
+    
+    <h3>Emergency Contact</h3>
+    <label>Contact Name</label>
+    <input type="text" id="emergencyName">
+    
+    <label>Phone</label>
+    <input type="tel" id="emergencyPhone">
+    
+    <label>Relationship</label>
+    <input type="text" id="relationship">
+    
+    <h3>Medical Information</h3>
+    <label>Allergies</label>
+    <textarea id="allergies"></textarea>
+    
+    <label>Chronic Conditions</label>
+    <textarea id="conditions"></textarea>
+    
+    <label>Current Medications</label>
+    <textarea id="medications"></textarea>
+    
+    <label>Ongoing Treatments</label>
+    <textarea id="treatments"></textarea>
+    
+    <label>Past Surgeries</label>
+    <textarea id="surgeries"></textarea>
+    
+    <h3>Insurance</h3>
+    <label>Provider</label>
+    <input type="text" id="insurance">
+    
+    <label>Policy Number</label>
+    <input type="text" id="policy">
+    
+    <button onclick="generateQR()">Generate QR Code</button>
+    
+    <div class="qr-container">
+        <canvas id="qr-code"></canvas>
+    </div>
+</div>
+
+<div class="container" id="details-container" style="display: none;">
+    <h2>Emergency Medical Details</h2>
+    <div class="details" id="details"></div>
+</div>
+
+<script>
+    function generateQR() {
+        let data = {
+            name: document.getElementById("name").value,
+            dob: document.getElementById("dob").value,
+            gender: document.getElementById("gender").value,
+            blood: document.getElementById("blood").value,
+            phone: document.getElementById("phone").value,
+            address: document.getElementById("address").value,
+            emergencyName: document.getElementById("emergencyName").value,
+            emergencyPhone: document.getElementById("emergencyPhone").value,
+            relationship: document.getElementById("relationship").value,
+            allergies: document.getElementById("allergies").value,
+            conditions: document.getElementById("conditions").value,
+            medications: document.getElementById("medications").value,
+            treatments: document.getElementById("treatments").value,
+            surgeries: document.getElementById("surgeries").value,
+            insurance: document.getElementById("insurance").value,
+            policy: document.getElementById("policy").value
+        };
+
+        let encryptedData = btoa(JSON.stringify(data));
+        let qrUrl = window.location.origin + window.location.pathname + "?data=" + encodeURIComponent(encryptedData);
+        new QRious({ element: document.getElementById("qr-code"), value: qrUrl, size: 200 });
+    }
+
+    let encodedData = new URLSearchParams(window.location.search).get("data");
+    if (encodedData) {
+        document.getElementById("form-container").style.display = "none";
+        document.getElementById("details-container").style.display = "block";
+        let decodedData = JSON.parse(atob(encodedData));
+        let output = "";
+        Object.keys(decodedData).forEach(key => output += <p><strong>${key.replace(/([A-Z])/g, ' $1')}:</strong> ${decodedData[key]}</p>);
+        document.getElementById("details").innerHTML = output;
+    }
+</script>
+
+</body>
+</html>
